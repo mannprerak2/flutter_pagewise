@@ -10,7 +10,7 @@ typedef Widget LoadingBuilder(BuildContext context);
 typedef Widget NoItemsFoundBuilder(BuildContext context);
 typedef Widget RetryBuilder(BuildContext context, RetryCallback retryCallback);
 typedef void RetryCallback();
-typedef Widget PagewiseBuilder<T>(PagewiseState<T> state);
+typedef Widget PagewiseBuilder<T>(PagewiseState<T?> state);
 
 /// An abstract base class for widgets that fetch their content one page at a
 /// time.
@@ -243,7 +243,7 @@ class PagewiseState<T> extends State<Pagewise<T?>> {
     return widget.builder(this);
   }
 
-  Widget? _itemBuilder(BuildContext context, int index) {
+  Widget _itemBuilder(BuildContext context, int index) {
     // The total number of widgets, is the number of loaded items, plus the
     // number of items that we appended to make all pages the same size,
     // plus 1 for the loader
@@ -251,7 +251,7 @@ class PagewiseState<T> extends State<Pagewise<T?>> {
         this._effectiveController!._appendedItems.length +
         1;
 
-    if (index >= total) return null;
+    if (index >= total) throw RangeError.index(index, 'Items');
 
     if (index == total - 1) {
       if (this._effectiveController!.noItemsFound) {
@@ -547,7 +547,7 @@ class PagewiseListView<T> extends Pagewise<T> {
             itemBuilder: itemBuilder,
             errorBuilder: errorBuilder,
             noItemsFoundBuilder: noItemsFoundBuilder,
-            builder: (PagewiseState<T> state) {
+            builder: (PagewiseState<T?> state) {
               return ListView.builder(
                   itemExtent: itemExtent,
                   addAutomaticKeepAlives: addAutomaticKeepAlives,
@@ -563,8 +563,7 @@ class PagewiseListView<T> extends Pagewise<T> {
                   primary: primary,
                   controller: controller,
                   itemCount: state._itemCount,
-                  itemBuilder:
-                      state._itemBuilder as Widget Function(BuildContext, int));
+                  itemBuilder: state._itemBuilder);
             });
 }
 
@@ -611,7 +610,7 @@ class PagewiseGridView<T> extends Pagewise<T> {
             itemBuilder: itemBuilder,
             errorBuilder: errorBuilder,
             noItemsFoundBuilder: noItemsFoundBuilder,
-            builder: (PagewiseState<T> state) {
+            builder: (PagewiseState<T?> state) {
               return GridView.builder(
                   reverse: reverse,
                   physics: physics,
@@ -633,8 +632,7 @@ class PagewiseGridView<T> extends Pagewise<T> {
                           mainAxisSpacing: mainAxisSpacing,
                           itemCount: state._itemCount),
                   itemCount: state._itemCount,
-                  itemBuilder:
-                      state._itemBuilder as Widget Function(BuildContext, int));
+                  itemBuilder: state._itemBuilder);
             });
 
   /// Creates a Pagewise GridView with a maxCrossAxisExtent.
@@ -679,7 +677,7 @@ class PagewiseGridView<T> extends Pagewise<T> {
             itemBuilder: itemBuilder,
             errorBuilder: errorBuilder,
             noItemsFoundBuilder: noItemsFoundBuilder,
-            builder: (PagewiseState<T> state) {
+            builder: (PagewiseState<T?> state) {
               return GridView.builder(
                   reverse: reverse,
                   physics: physics,
@@ -701,8 +699,7 @@ class PagewiseGridView<T> extends Pagewise<T> {
                           mainAxisSpacing: mainAxisSpacing,
                           itemCount: state._itemCount),
                   itemCount: state._itemCount,
-                  itemBuilder:
-                      state._itemBuilder as Widget Function(BuildContext, int));
+                  itemBuilder: state._itemBuilder);
             });
 }
 
@@ -741,7 +738,7 @@ class PagewiseSliverList<T> extends Pagewise<T> {
             itemBuilder: itemBuilder,
             errorBuilder: errorBuilder,
             noItemsFoundBuilder: noItemsFoundBuilder,
-            builder: (PagewiseState<T> state) {
+            builder: (PagewiseState<T?> state) {
               return SliverList(
                 delegate: SliverChildBuilderDelegate(state._itemBuilder,
                     addAutomaticKeepAlives: addAutomaticKeepAlives,
@@ -791,7 +788,7 @@ class PagewiseSliverGrid<T> extends Pagewise<T> {
             itemBuilder: itemBuilder,
             errorBuilder: errorBuilder,
             noItemsFoundBuilder: noItemsFoundBuilder,
-            builder: (PagewiseState<T> state) {
+            builder: (PagewiseState<T?> state) {
               return SliverGrid(
                 delegate: SliverChildBuilderDelegate(state._itemBuilder,
                     addAutomaticKeepAlives: addAutomaticKeepAlives,
@@ -846,7 +843,7 @@ class PagewiseSliverGrid<T> extends Pagewise<T> {
             showRetry: showRetry,
             itemBuilder: itemBuilder,
             errorBuilder: errorBuilder,
-            builder: (PagewiseState<T> state) {
+            builder: (PagewiseState<T?> state) {
               return SliverGrid(
                 delegate: SliverChildBuilderDelegate(state._itemBuilder,
                     addAutomaticKeepAlives: addAutomaticKeepAlives,
