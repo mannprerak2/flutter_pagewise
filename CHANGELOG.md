@@ -1,3 +1,7 @@
+## 2.0.0 - 20/03/2021
+
+- Migrate to Null safety.
+
 ## 1.2.3 - 27/03/2019
 
 - Handle a null Future return when loading a page. We assume a null Future is the same as an empty one.
